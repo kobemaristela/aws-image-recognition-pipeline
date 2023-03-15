@@ -3,7 +3,7 @@ Resources:
   EC2InstanceA:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0df24e148fdb9f1d8  # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+      ImageId: ami-005f9685cb30f234b  # Amazon Linux 2 AMI (us-east-1) - Kernel 5.10, SSD Volume Type
       InstanceType: t2.micro
       KeyName: CS442
       SecurityGroupIds:
@@ -25,7 +25,7 @@ Resources:
   EC2InstanceB:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0df24e148fdb9f1d8  # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+      ImageId: ami-005f9685cb30f234b  # Amazon Linux 2 AMI (us-east-1) - Kernel 5.10, SSD Volume Type
       InstanceType: t2.micro
       KeyName: CS442
       SecurityGroupIds:

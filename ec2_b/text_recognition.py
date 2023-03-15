@@ -20,7 +20,7 @@ sqs = boto3.resource('sqs', region_name=region_name)
 queue = sqs.get_queue_by_name(QueueName=queue_name)
 
 while True:
-    # Read incoming message from SQS
+    # Read incoming messages from SQS
     messages = queue.receive_messages()
 
     for message in messages:
@@ -31,7 +31,7 @@ while True:
             message.delete()    # Delete terminate message
             print("Text Recognition Complete...")
             exit(0)
-        
+
         print(f"Processing image: {image}")
         # Text Detection using AWS Rekognition
         ## https://docs.aws.amazon.com/code-library/latest/ug/python_3_rekognition_code_examples.html
@@ -51,12 +51,11 @@ while True:
             # Compile all detected text
             text_found = ""
             for detected_text in response['TextDetections']:
-                if detected_text['Type'] == 'LINE':
-                    text_found += detected_text['DetectedText'] + ", "
+                text_found += detected_text['DetectedText'] + ", "
 
             # Write text detected to outfile
-            with open('output.txt', 'a') as f:
-                f.write(f"{image}: {text_found}\n")
+            with open('output.txt', mode='a', encoding='utf-8') as f:
+                f.write(f"{image}: {text_found}\n\n")
 
         # Remove message
         message.delete()

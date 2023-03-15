@@ -17,6 +17,7 @@ Resources:
             #!/bin/bash
             sudo yum update -y
             sudo yum install -y git
+            cd /home/ec2-user
             git clone https://github.com/kobemaristela/aws-image-recognition-pipeline.git
             cd aws-image-recognition-pipeline/
             pip3 install -r requirements.txt
@@ -39,6 +40,7 @@ Resources:
             #!/bin/bash
             sudo yum update -y
             sudo yum install -y git
+            cd /home/ec2-user
             git clone https://github.com/kobemaristela/aws-image-recognition-pipeline.git
             cd aws-image-recognition-pipeline/
             pip3 install -r requirements.txt

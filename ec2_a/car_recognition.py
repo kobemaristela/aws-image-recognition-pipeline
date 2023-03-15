@@ -8,9 +8,9 @@ bucket_name = os.getenv('BUCKET_NAME')
 queue_name = os.getenv('QUEUE_NAME')
 
 # Initiate rekognition client
-rekognition = boto3.client('rekognition', region_name='us-east-1') # IMPORTANT - Global Region
+rekognition = boto3.client('rekognition', region_name='us-east-1')  # IMPORTANT - Global Region
 
-# Initiate S3 connection to cs442-unr
+# Initiate S3 connection to bucket
 s3 = boto3.resource('s3')
 bucket = s3.Bucket(bucket_name)
 
@@ -19,7 +19,7 @@ sqs = boto3.resource('sqs')
 queue = sqs.get_queue_by_name(QueueName=queue_name)
 
 # Loop through all images
-for img in bucket.objects.all():
+for image in bucket.objects.all():
     # Label Detection using AWS Rekognition
     ## https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectLabels.html
     ## https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/python/example_code/rekognition/rekognition_image_detection.py
@@ -29,7 +29,7 @@ for img in bucket.objects.all():
         Image={
             'S3Object': {
                 'Bucket': bucket_name,
-                'Name': img.key
+                'Name': image.key
             }
         }
     )
@@ -37,6 +37,6 @@ for img in bucket.objects.all():
     # Checks if car detected with confidence > 90
     for label in response['Labels']:
         if label['Name'] == 'Car' and label['Confidence'] > 90:
-            queue.send_message(MessageBody=img.key)  # Send image to queue
+            queue.send_message(MessageBody=image.key)  # Send image to queue
 
 queue.send_message(MessageBody="-1")    # Send end of images

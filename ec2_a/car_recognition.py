@@ -39,6 +39,8 @@ for image in bucket.objects.all():
     for label in response['Labels']:
         if label['Name'] == 'Car' and label['Confidence'] > 90:
             print(f'Car Image Found: {image.key}')
-            queue.send_message(MessageBody=image.key)  # Send image to queue
+            queue.send_message(MessageBody=image.key, MessageGroupId='car-detection')  # Send image to queue
 
 queue.send_message(MessageBody="-1")    # Send end of images
+print("Car Detection Complete...")
+

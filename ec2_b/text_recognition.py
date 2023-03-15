@@ -25,14 +25,14 @@ while True:
 
     for message in messages:
         image = message.body
-        print(f"Processing image: {image}")
 
         # Termination index detected - break out of loop
         if image == "-1":
             message.delete()    # Delete terminate message
             print("Text Recognition Complete...")
-            break
-
+            exit(0)
+        
+        print(f"Processing image: {image}")
         # Text Detection using AWS Rekognition
         ## https://docs.aws.amazon.com/code-library/latest/ug/python_3_rekognition_code_examples.html
         ## https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectText.html

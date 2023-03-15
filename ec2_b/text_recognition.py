@@ -25,10 +25,12 @@ while True:
 
     for message in messages:
         image = message.body
+        print(f"Processing image: {image}")
 
         # Termination index detected - break out of loop
         if image == "-1":
             message.delete()    # Delete terminate message
+            print("Text Recognition Complete...")
             break
 
         # Text Detection using AWS Rekognition
@@ -39,7 +41,7 @@ while True:
             Image={
                 'S3Object': {
                     'Bucket': bucket_name,
-                    'Name': image.key
+                    'Name': image
                 }
             }
         )
@@ -54,7 +56,7 @@ while True:
 
             # Write text detected to outfile
             with open('output.txt', 'a') as f:
-                f.write(f"{image.key}: {text_found}\n")
+                f.write(f"{image}: {text_found}\n")
 
         # Remove message
         message.delete()

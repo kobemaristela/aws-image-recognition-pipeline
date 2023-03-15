@@ -1,0 +1,81 @@
+Resources:
+  # EC2 A - Car Recognition
+  EC2InstanceA:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0df24e148fdb9f1d8  # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+      InstanceType: t2.micro
+      KeyName: CS442
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      Tags:
+        - Key: Name
+          Value: CS442_PA1_A
+  
+  # EC2 B - Text Extraction
+  EC2InstanceB:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0df24e148fdb9f1d8  # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+      InstanceType: t2.micro
+      KeyName: CS442
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      Tags:
+        - Key: Name
+          Value: CS442_PA1_B
+
+  # Security Group - Allow SSH, HTTP, HTTPS
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: CS442_PA1_Security_Group
+      GroupDescription: Allow SSH, HTTP, HTTPS
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0     # Add your own IP address
+        - IpProtocol: tcp       # HTTP Access
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp       # HTTPS Access
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  # Instance Profile - Attached to EC2 instance
+  EC2InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      InstanceProfileName: CS442_PA1_Profile
+      Roles:
+        - !Ref EC2InstanceRole
+
+  # Instance Role - Attached to EC2 instance (Allows S3, SQS, Rekognition)
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CS442_PA1_Role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - ec2.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess  # Only need to read from bucket
+      - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+      - arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
+
+  # SQS Queue - Car Recognized Queue
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: car-recognition-queue

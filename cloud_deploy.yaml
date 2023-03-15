@@ -78,4 +78,5 @@ Resources:
   SQSQueue:
     Type: AWS::SQS::Queue
     Properties:
+      FifoQueue: true,
       QueueName: car-recognition-queue

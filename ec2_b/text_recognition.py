@@ -31,7 +31,9 @@ while True:
             break
 
         # Text Detection using AWS Rekognition
-        # https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectText.html
+        ## https://docs.aws.amazon.com/code-library/latest/ug/python_3_rekognition_code_examples.html
+        ## https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectText.html
+        ## https://docs.aws.amazon.com/rekognition/latest/dg/text-detecting-text-procedure.html
         response = rekognition.detect_text(
             Image={
                 'S3Object': {

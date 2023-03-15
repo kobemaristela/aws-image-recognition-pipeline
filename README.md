@@ -1,1 +1,1 @@
-# -aws-image-recognition-pipeline
+# aws-image-recognition-pipeline

@@ -12,13 +12,14 @@ Resources:
       Tags:
         - Key: Name
           Value: CS442_PA1_A
-      Fn::Base64: !Sub |
-          #!/bin/bash
-          sudo yum update -y
-          sudo yum install -y git
-          git clone https://github.com/kobemaristela/aws-image-recognition-pipeline.git
-          cd aws-image-recognition-pipeline/
-          pip3 install -r requirements.txt
+      UserData:
+        Fn::Base64: !Sub |
+            #!/bin/bash
+            sudo yum update -y
+            sudo yum install -y git
+            git clone https://github.com/kobemaristela/aws-image-recognition-pipeline.git
+            cd aws-image-recognition-pipeline/
+            pip3 install -r requirements.txt
   
   # EC2 B - Text Extraction
   EC2InstanceB:
@@ -33,13 +34,14 @@ Resources:
       Tags:
         - Key: Name
           Value: CS442_PA1_B
-      Fn::Base64: !Sub |
-          #!/bin/bash
-          sudo yum update -y
-          sudo yum install -y git
-          git clone https://github.com/kobemaristela/aws-image-recognition-pipeline.git
-          cd aws-image-recognition-pipeline/
-          pip3 install -r requirements.txt
+      UserData:
+        Fn::Base64: !Sub |
+            #!/bin/bash
+            sudo yum update -y
+            sudo yum install -y git
+            git clone https://github.com/kobemaristela/aws-image-recognition-pipeline.git
+            cd aws-image-recognition-pipeline/
+            pip3 install -r requirements.txt
 
   # Security Group - Allow SSH, HTTP, HTTPS
   EC2SecurityGroup:

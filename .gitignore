@@ -130,3 +130,6 @@ dmypy.json
 
 # Private Keys
 *.pem
+
+# Large Files
+*.zip

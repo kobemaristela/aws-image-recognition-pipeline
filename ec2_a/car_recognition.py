@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # Import environment variables
 load_dotenv('../.env.template')  # Grab from root
 bucket_name = os.getenv('BUCKET_NAME')
-queue_name = os.getenv('QUEUE_NAME')
+queue_name = os.getenv('CAR_QUEUE')
 region_name = os.getenv('REGION_NAME')
 
 # Initiate rekognition client
@@ -35,7 +35,7 @@ for image in bucket.objects.all():
         }
     )
 
-    # Checks if car detected with confidence > 90
+    # Checks if car detected with confidence >= 90
     for label in response['Labels']:
         if label['Name'] == 'Car' and label['Confidence'] >= 90:
             print(f'Car Image Found: {image.key}')

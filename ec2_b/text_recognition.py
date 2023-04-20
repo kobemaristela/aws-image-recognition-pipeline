@@ -5,15 +5,11 @@ from dotenv import load_dotenv
 # Import environment variables
 load_dotenv('../.env.template')  # Grab from root
 bucket_name = os.getenv('BUCKET_NAME')
-queue_name = os.getenv('QUEUE_NAME')
+queue_name = os.getenv('PERSON_QUEUE')
 region_name = os.getenv('REGION_NAME')
 
 # Initiate rekognition client
 rekognition = boto3.client('rekognition', region_name=region_name)  # IMPORTANT - Global Region
-
-# Initiate S3 connection to bucket
-s3 = boto3.resource('s3')
-bucket = s3.Bucket(bucket_name)
 
 # Initiate SQS connection to car queue
 sqs = boto3.resource('sqs', region_name=region_name)

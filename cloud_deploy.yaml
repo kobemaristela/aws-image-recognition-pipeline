@@ -103,6 +103,7 @@ Resources:
   #------------------------------------------------------------------------------------#
   # Part 2
   #------------------------------------------------------------------------------------#
+  # SQS Queue - Person Recognized Queue
   PersonQueue:
     Type: AWS::SQS::Queue
     Properties:
@@ -110,7 +111,7 @@ Resources:
       ContentBasedDeduplication: true
       QueueName: person-recognition-queue.fifo
 
-
+  # Lambda Function - Person Detection
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -118,47 +119,34 @@ Resources:
       Handler: index.lambda_handler
       Runtime: python3.8
       Timeout: 30
-      Role: !Ref LambdaFunctionRole
+      Role: !GetAtt LambdaFunctionRole.Arn
       Code:
         ZipFile: |
           import boto3
-          import json
 
           # Initiate sqs & rekognition client
           rekognition = boto3.client('rekognition', region_name='us-east-1')  # IMPORTANT - Global Region
-          car_queue = boto3.client('sqs', region_name='us-east-1')  # IMPORTANT - Global Region
           
-          # Person Queue
+          # Initiate SQS connection to car queue
           sqs = boto3.resource('sqs', region_name='us-east-1')
-          person_queue = sqs.get_queue_by_name(QueueName='person-recognition-queue.fifo')
+          queue = sqs.get_queue_by_name(QueueName='person-recognition-queue.fifo')
 
           def lambda_handler(event, context):
-            for record in event['Records']:
-              # Extract the message body
-              message_body = json.loads(record['body'])
-              print('Received message: ' + message_body)
+            for message in event['Records']:
+              # Read incoming message from event trigger
+              image = message['body']
 
-              if message_body == "-1":
-                receipt_handle = record['receiptHandle']
-                sqs.delete_message(
-                    QueueUrl=record['eventSourceARN'],
-                    ReceiptHandle=receipt_handle
-                )
+              if image == "-1":
+                print("Person Detection Complete...")
+                queue.send_message(MessageBody="-1", MessageGroupId="person-recognition")
+                return {'statusCode': 200, 'body': 'Person Detection Complete...'}
 
-                person_queue.send_message(MessageBody="-1", MessageGroupId="person-recognition")
-                print("Car Detection Complete...")
-
-                return {
-                  'statusCode': 200,
-                  'body': json.dumps('Person Detection Complete...')
-                }
-
-
+              # Label Detection using AWS Rekognition
               response = rekognition.detect_labels(
                 Image={
                     'S3Object': {
                         'Bucket': 'cs442-unr',
-                        'Name': message_body
+                        'Name': image
                     }
                 }
               )
@@ -166,11 +154,11 @@ Resources:
               # Checks if car detected with confidence >= 90
               for label in response['Labels']:
                 if label['Name'] == 'Person' and label['Confidence'] >= 90:
-                  print(f'Person Image Found: {message_body}')
-                  person_queue.send_message(MessageBody=message_body, MessageGroupId="person-recognition")
+                  print(f'Person Image Found: {image}')
+                  queue.send_message(MessageBody=image, MessageGroupId="person-recognition")
+                  return {'statusCode': 200, 'body': f'Person Image Found: {image}'}
 
-
-  # Instance Role - Attached to EC2 instance (Allows S3, SQS, Rekognition)
+  # Lambda Role - Allows S3, SQS, Rekognition
   LambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -189,7 +177,7 @@ Resources:
       - arn:aws:iam::aws:policy/AmazonSQSFullAccess
       - arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
 
-
+  # Trigger Setup - Car Queue to Lambda Function
   EventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
@@ -197,4 +185,3 @@ Resources:
       Enabled: True
       EventSourceArn: !GetAtt CarQueue.Arn
       FunctionName: !Ref LambdaFunction
-      StartingPosition: LATEST

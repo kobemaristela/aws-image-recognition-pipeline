@@ -35,9 +35,9 @@ for image in bucket.objects.all():
         }
     )
 
-    # Checks if car detected with confidence >= 90
+    # Checks if car detected with confidence > 90
     for label in response['Labels']:
-        if label['Name'] == 'Car' and label['Confidence'] >= 90:
+        if label['Name'] == 'Car' and label['Confidence'] > 90:
             print(f'Car Image Found: {image.key}')
             queue.send_message(MessageBody=image.key, MessageGroupId="car-recognition")  # Send image to queue
 

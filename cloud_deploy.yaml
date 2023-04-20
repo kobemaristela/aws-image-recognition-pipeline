@@ -136,6 +136,7 @@ Resources:
               # Read incoming message from event trigger
               image = message['body']
 
+              # Termination index detected - End of Detection
               if image == "-1":
                 print("Person Detection Complete...")
                 queue.send_message(MessageBody="-1", MessageGroupId="person-recognition")
@@ -151,9 +152,9 @@ Resources:
                 }
               )
 
-              # Checks if car detected with confidence >= 90
+              # Checks if car detected with confidence > 90
               for label in response['Labels']:
-                if label['Name'] == 'Person' and label['Confidence'] >= 90:
+                if label['Name'] == 'Person' and label['Confidence'] > 90:
                   print(f'Person Image Found: {image}')
                   queue.send_message(MessageBody=image, MessageGroupId="person-recognition")
                   return {'statusCode': 200, 'body': f'Person Image Found: {image}'}
@@ -178,6 +179,7 @@ Resources:
       - arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
 
   # Trigger Setup - Car Queue to Lambda Function
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html
   EventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
